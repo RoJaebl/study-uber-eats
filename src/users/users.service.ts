@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import {
   CreateAccountInput,
@@ -7,12 +8,14 @@ import { User } from './entities/user.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly users: Repository<User>,
+    private readonly config: ConfigService,
   ) {}
 
   async createAccount({
@@ -32,14 +35,13 @@ export class UsersService {
     }
   }
   async login({ email, password }: LoginInput): Promise<LoginOutput> {
-    // find ther user with the email
-    // check if the passowrd is correct
-    // make JWT and give it to the user
     try {
+      // find ther user with the email
       const user = await this.users.findOne({ where: { email } });
       if (!user) {
         return { ok: false, error: 'User not found' };
       }
+      // check if the passowrd is correct
       const passowrdCorrect = await user.checkPassword(password);
       if (!passowrdCorrect) {
         return {
@@ -47,6 +49,8 @@ export class UsersService {
           error: 'Wrong password',
         };
       }
+      // make JWT and give it to the user
+      const token = jwt.sign({ id: user.id }, this.config.get('SECRET_KEY'));
       return {
         ok: true,
         token: 'adfasdf',
@@ -58,20 +62,4 @@ export class UsersService {
       };
     }
   }
-  // async createAccount({
-  //   email,
-  //   password,
-  //   role,
-  // }: CreateAccountInput): Promise<[boolean, string?]> {
-  //   try {
-  //     const exists = await this.users.findOne({ where: { email } });
-  //     if (exists) {
-  //       return [false, 'There is a user with that email already'];
-  //     }
-  //     await this.users.save(this.users.create({ email, password, role }));
-  //     return [true];
-  //   } catch (e) {
-  //     return [false, "Couldn't create account"];
-  //   }
-  // }
 }
