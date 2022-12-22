@@ -1,3 +1,4 @@
+import { JwtService } from './../jwt/jwt.service';
 import { ConfigService } from '@nestjs/config';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import {
@@ -16,7 +17,10 @@ export class UsersService {
     @InjectRepository(User)
     private readonly users: Repository<User>,
     private readonly config: ConfigService,
-  ) {}
+    private readonly jwtService: JwtService,
+  ) {
+    this.jwtService.hello();
+  }
 
   async createAccount({
     email,
