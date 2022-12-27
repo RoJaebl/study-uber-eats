@@ -1,5 +1,4 @@
 import { JwtService } from './../jwt/jwt.service';
-import { ConfigService } from '@nestjs/config';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import {
   CreateAccountInput,
@@ -9,7 +8,6 @@ import { User } from './entities/user.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class UsersService {
@@ -62,5 +60,8 @@ export class UsersService {
         error,
       };
     }
+  }
+  async findById(id: number): Promise<User> {
+    return this.users.findOne({ where: { id } });
   }
 }

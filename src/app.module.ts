@@ -1,6 +1,5 @@
 import { User } from './users/entities/user.entity';
 import {
-  MethodNotAllowedException,
   MiddlewareConsumer,
   Module,
   NestModule,
@@ -14,8 +13,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { CommonModule } from './common/common.module';
 import { JwtModule } from './jwt/jwt.module';
-import { jwtMiddleware } from './jwt/jwt.middleware';
-import path from 'path';
+import { JwtMiddleware } from './jwt/jwt.middleware';
 
 @Module({
   imports: [
@@ -60,7 +58,7 @@ import path from 'path';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(jwtMiddleware).forRoutes({
+    consumer.apply(JwtMiddleware).forRoutes({
       path: '/graphql',
       method: RequestMethod.ALL,
     });
