@@ -5,13 +5,15 @@ import {
 } from './dtos/create-account.dto';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
-import { Args, Query, Resolver, Mutation } from '@nestjs/graphql';
+import { Args, Query, Resolver, Mutation, Context } from '@nestjs/graphql';
+import { PossibleTypeExtensionsRule } from 'graphql';
+import e from 'express';
 
 @Resolver((of) => User)
 export class UsersResolver {
   constructor(private readonly userService: UsersService) {}
   @Query((types) => Boolean)
-  sayHi() {
+  sayHi() { 
     return true;
   }
   @Mutation((resturns) => CreateAccountOutput)
@@ -33,5 +35,11 @@ export class UsersResolver {
     }
   }
   @Query((returns) => Boolean)
-  me() {}
+  me(@Context() context) {
+    if(!context.user){
+      return;
+    }else{
+      return context.user;
+    }
+  }
 }
